@@ -1,9 +1,10 @@
 import random
+from unittest.main import main
 
 import pygame
 
-couleurs = ["Coeur", "Carreau", "Trèfle", "Pique"]
-rangs = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "Valet", "Dame", "Roi", "As"]
+couleurs = ["♥", "♦", "♣", "♠"]
+rangs = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
 
 valeurs_point = {
     "2": 2,
@@ -15,13 +16,24 @@ valeurs_point = {
     "8": 8,
     "9": 9,
     "10": 10,
-    "Valet": 10,
-    "Dame": 10,
-    "Roi": 10,
-    "As": 11,
+    "J": 10,
+    "Q": 10,
+    "K": 10,
+    "A": 11,
 }
-
 
 paquet = [(couleur, rang) for couleur in couleurs for rang in rangs]
 random.shuffle(paquet)
-print(paquet)
+# print(paquet)
+main_joueur = []
+main_croupier = []
+
+main_joueur.append(paquet.pop(0))
+main_croupier.append(paquet.pop(0))
+main_joueur.append(paquet.pop(0))
+main_croupier.append(paquet.pop(0))
+print("main_joueur:", main_joueur)
+print("main_croupier:", main_croupier)
+
+print("point joueur:", sum(valeurs_point[rang] for _, rang in main_joueur))
+print("point croupier:", sum(valeurs_point[rang] for _, rang in main_croupier))
