@@ -1,0 +1,2 @@
+DISPLAY_CAPTION = "Blackjack"
+CARD_RATIO = 100
