@@ -1,5 +1,5 @@
 class Player:
-    valeurs_point = {
+    point_values = {
         "2": 2,
         "3": 3,
         "4": 4,
@@ -15,18 +15,15 @@ class Player:
         "A": 11,
     }
 
-    def __init__(self, nom="Joueur"):
-        self.nom = nom
-        self.main = []
+    def __init__(self, name="Player"):
+        self.name = name
+        self.hand = []
 
-    def hit(self, carte):
-        self.main.append(carte)
+    def add_card(self, card_data):
+        self.hand.append(card_data)
 
-    def stand(self):
-        self.main.append(None)
-
-    def calcul_score(self):
-        return sum(self.valeurs_point[rang] for _, rang in self.main)
+    def calculate_score(self):
+        return sum(self.point_values[rank] for rank, suit in self.hand)
 
     def show_hand(self):
-        print(f"Main de {self.nom} : {self.main} (Score : {self.calcul_score()})")
+        print(f"{self.name}'s hand: {self.hand} (Score: {self.calculate_score()})")
