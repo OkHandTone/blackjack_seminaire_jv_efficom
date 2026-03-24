@@ -31,15 +31,14 @@ class Game:
 
         for i in range(2):
             rank, suit = self.deck.pop()
-            self.player1.add_card((rank, suit))
-            Card(rank, suit, i, 1, True)
+            self.dealer.add_card((rank, suit))  # Sauvegarde backend
+            is_flipped = True if i == 0 else False
+            Card(rank, suit, i, 1, is_flipped)
 
-        # 2. Distribution au Croupier (Player = 2)
         for i in range(2):
             rank, suit = self.deck.pop()
-            self.dealer.add_card((rank, suit))
-            is_flipped = True if i == 0 else False
-            Card(rank, suit, i, 2, is_flipped)
+            self.player1.add_card((rank, suit))  # Sauvegarde backend
+            Card(rank, suit, i, 2, True)
 
         self.player1.show_hand()
         self.dealer.show_initial_hand()
