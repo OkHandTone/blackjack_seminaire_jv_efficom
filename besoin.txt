@@ -1,0 +1,6 @@
+en haut - centre : main croupier
+en bas - centre : main joueur
+en bas a droite : button tirer
+en bas a gauche : button rester
+au centre - centre : mise
+au centre - gauche banque (argent total)

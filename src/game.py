@@ -24,7 +24,7 @@ valeurs_point = {
 
 paquet = [(couleur, rang) for couleur in couleurs for rang in rangs]
 random.shuffle(paquet)
-# print(paquet)
+
 main_joueur = []
 main_croupier = []
 
@@ -32,8 +32,12 @@ main_joueur.append(paquet.pop(0))
 main_croupier.append(paquet.pop(0))
 main_joueur.append(paquet.pop(0))
 main_croupier.append(paquet.pop(0))
-print("main_joueur:", main_joueur)
-print("main_croupier:", main_croupier)
 
-print("point joueur:", sum(valeurs_point[rang] for _, rang in main_joueur))
-print("point croupier:", sum(valeurs_point[rang] for _, rang in main_croupier))
+total_main_joueur = sum(valeurs_point[rang] for _, rang in main_joueur)
+total_main_croupier = sum(valeurs_point[rang] for _, rang in main_croupier)
+
+print("main_joueur:", total_main_joueur)
+print("main_croupier:", total_main_croupier)
+
+# print("point joueur:", sum(valeurs_point[rang] for _, rang in main_joueur))
+# print("point croupier:", sum(valeurs_point[rang] for _, rang in main_croupier))
