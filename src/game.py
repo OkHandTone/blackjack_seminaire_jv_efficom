@@ -20,15 +20,35 @@ class Game:
 
         # logique Martin
         # ---------------------------------
-        self.rank = ["H", "D", "C", "S"]
+        # rank (2, 3, 4, etc)
+        # suit (K, Q, etc)
+        # cards (nombre de cartes dont le joueur dispose)
+        # player (1 ou 2)
+        # flipped (carte retournée ou non)
+        # format : Card(2, "C", 2, 2, true)
+
         self.suit = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
-
+        self.rank = ["H", "D", "C", "S"]
         self.cards = 2
-        self.pack = [(couleur, rang) for couleur in self.rank for rang in self.suit]
-        random.shuffle(self.pack)
-
         self.player = Player("Player")
         self.croupier = Croupier()
+        self.flipped = True
+
+        self.pack_joueur = [
+            (couleur, rang, 1, f"{rang}.bmp", self.flipped)
+            for couleur in self.rank
+            for rang in self.suit
+        ]
+
+        self.pack_croupier = [
+            (couleur, rang, 2, f"{rang}.bmp", self.flipped)
+            for couleur in self.rank
+            for rang in self.suit
+        ]
+
+        random.shuffle(self.pack_joueur)
+        random.shuffle(self.pack_croupier)
+
         # ---------------------------------
 
     def run(self):
@@ -45,21 +65,18 @@ class Game:
     def update(self):
 
         for _ in range(2):
-            self.player.hit(self.pack.pop(0))
-            self.croupier.hit(self.pack.pop(0))
+            self.player.hit(self.pack_joueur.pop(0))
+            self.croupier.hit(self.pack_croupier.pop(0))
 
         self.player.show_hand()
         self.croupier.show_card()
 
     def flip_card(self):
         self.croupier.main[1] = self.pack.pop(0)
-        print(
-            f"\nLe croupier a tiré : {self.croupier.main[1][1]} de {self.croupier.main[1][0]}"
-        )
         self.croupier.show_hand()
         if self.croupier.calcul_score() > 21:
             print("Le croupier a dépassé 21 ! Vous avez gagné.")
-            return
+        return
 
     def hit_card(self):
         nouvelle_carte = self.pack.pop(0)
