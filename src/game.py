@@ -20,8 +20,11 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-            self.screen.fill((0, 0, 0))
-            Card.instances.draw(self.screen)
-            pygame.display.flip()
+            self.render()
             self.clock.tick(60)
         pygame.quit()
+
+    def render(self):
+        self.screen.fill((0, 0, 0))
+        Card.instances.draw(self.screen)
+        pygame.display.flip()
