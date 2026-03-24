@@ -1,7 +1,7 @@
 import pygame
 
 from card import Card
-from settings import DISPLAY_CAPTION
+from settings import DISPLAY_CAPTION, WINDOW_HEIGHT, WINDOW_WIDTH
 
 
 class Game:
@@ -9,10 +9,8 @@ class Game:
         pygame.init()
         pygame.display.set_caption(DISPLAY_CAPTION)
 
-        self.screen = pygame.display.set_mode((800, 600))
+        self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.clock = pygame.time.Clock()
-
-        Card(0, 0, 10, "10.bmp")
 
     def run(self):
         running = True
