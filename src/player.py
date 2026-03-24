@@ -19,11 +19,14 @@ class Player:
         self.nom = nom
         self.main = []
 
-    def ajouter_carte(self, carte):
+    def hit(self, carte):
         self.main.append(carte)
 
-    def calculer_score(self):
+    def stand(self):
+        self.main.append(None)
+
+    def calcul_score(self):
         return sum(self.valeurs_point[rang] for _, rang in self.main)
 
-    def afficher_main(self):
-        print(f"Main de {self.nom} : {self.main} (Score : {self.calculer_score()})")
+    def show_hand(self):
+        print(f"Main de {self.nom} : {self.main} (Score : {self.calcul_score()})")
