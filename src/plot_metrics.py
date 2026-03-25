@@ -18,6 +18,16 @@ def ensure_output_dir():
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 
+def apply_common_style():
+    plt.rcParams.update({
+        "font.size": 11,
+        "axes.titlesize": 14,
+        "axes.labelsize": 12,
+        "xtick.labelsize": 10,
+        "ytick.labelsize": 10
+    })
+
+
 def plot_results_distribution(conn):
     query = """
         SELECT result, COUNT(*) AS count
@@ -31,13 +41,16 @@ def plot_results_distribution(conn):
         print("Aucune donnée pour le graphe des résultats.")
         return
 
-    plt.figure(figsize=(8, 5))
-    plt.bar(df["result"], df["count"])
+    plt.figure(figsize=(7, 6))
+    plt.pie(
+        df["count"],
+        labels=df["result"],
+        autopct="%1.1f%%",
+        startangle=90
+    )
     plt.title("Répartition des résultats")
-    plt.xlabel("Résultat")
-    plt.ylabel("Nombre de manches")
     plt.tight_layout()
-    plt.savefig(OUTPUT_DIR / "results_distribution.png")
+    plt.savefig(OUTPUT_DIR / "results_distribution.png", dpi=200)
     plt.close()
 
     print("Graphe enregistré : results_distribution.png")
@@ -57,12 +70,25 @@ def plot_actions_frequency(conn):
         return
 
     plt.figure(figsize=(8, 5))
-    plt.bar(df["action_type"], df["count"])
+    bars = plt.bar(df["action_type"], df["count"])
+
     plt.title("Fréquence des actions du joueur")
-    plt.xlabel("Action")
+    plt.xlabel("Type d'action")
     plt.ylabel("Nombre d'occurrences")
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+
+    for bar in bars:
+        height = bar.get_height()
+        plt.text(
+            bar.get_x() + bar.get_width() / 2,
+            height + 0.05,
+            f"{int(height)}",
+            ha="center",
+            va="bottom"
+        )
+
     plt.tight_layout()
-    plt.savefig(OUTPUT_DIR / "actions_frequency.png")
+    plt.savefig(OUTPUT_DIR / "actions_frequency.png", dpi=200)
     plt.close()
 
     print("Graphe enregistré : actions_frequency.png")
@@ -88,11 +114,16 @@ def plot_bust_rate(conn):
     labels = ["Bust", "Non bust"]
     values = [bust_count, non_bust_count]
 
-    plt.figure(figsize=(6, 6))
-    plt.pie(values, labels=labels, autopct="%1.1f%%")
+    plt.figure(figsize=(7, 6))
+    plt.pie(
+        values,
+        labels=labels,
+        autopct="%1.1f%%",
+        startangle=90
+    )
     plt.title("Taux de dépassement de 21")
     plt.tight_layout()
-    plt.savefig(OUTPUT_DIR / "bust_rate.png")
+    plt.savefig(OUTPUT_DIR / "bust_rate.png", dpi=200)
     plt.close()
 
     print("Graphe enregistré : bust_rate.png")
@@ -111,20 +142,34 @@ def plot_average_game_duration(conn):
         print("Aucune donnée pour le graphe de durée des parties.")
         return
 
-    plt.figure(figsize=(10, 5))
-    plt.bar(df["game_id"].astype(str), df["duration_seconds"])
+    plt.figure(figsize=(9, 5))
+    bars = plt.bar(df["game_id"].astype(str), df["duration_seconds"])
+
     plt.title("Durée des parties")
-    plt.xlabel("Game ID")
+    plt.xlabel("Identifiant de partie")
     plt.ylabel("Durée (secondes)")
     plt.xticks(rotation=45, ha="right")
+    plt.grid(axis="y", linestyle="--", alpha=0.7)
+
+    for bar in bars:
+        height = bar.get_height()
+        plt.text(
+            bar.get_x() + bar.get_width() / 2,
+            height + 0.05,
+            f"{int(height)}",
+            ha="center",
+            va="bottom"
+        )
+
     plt.tight_layout()
-    plt.savefig(OUTPUT_DIR / "game_durations.png")
+    plt.savefig(OUTPUT_DIR / "game_durations.png", dpi=200)
     plt.close()
 
     print("Graphe enregistré : game_durations.png")
 
 
 def main():
+    apply_common_style()
     ensure_output_dir()
 
     if not DB_PATH.exists():
