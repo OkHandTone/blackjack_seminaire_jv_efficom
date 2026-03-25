@@ -20,7 +20,7 @@ class Card(pygame.sprite.Sprite):
         if self.isFlipped:
             self.load_image()
         else:
-            self.load_white_background()
+            self.load_back()
 
         self.set_position()
 
@@ -41,9 +41,10 @@ class Card(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = (int(left), top)
 
-    def load_white_background(self):
-        self.image = pygame.Surface((CARD_WIDTH, CARD_HEIGHT))
-        self.image.fill((255, 255, 255))
+    def load_back(self):
+        image_path = os.path.join("assets", "cards", "back.bmp")
+        image = pygame.image.load(image_path)
+        self.image = pygame.transform.scale(image, (CARD_WIDTH, CARD_HEIGHT))
 
     def show(self):
         self.load_image()
