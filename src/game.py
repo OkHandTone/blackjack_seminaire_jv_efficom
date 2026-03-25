@@ -1,7 +1,9 @@
 import pygame
 
+from components.button import Button
 from components.card import Card
 from components.hit_button import HitButton
+from components.stand_button import StandButton
 from settings import DISPLAY_CAPTION, WINDOW_HEIGHT, WINDOW_WIDTH
 
 
@@ -13,13 +15,16 @@ class Game:
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.clock = pygame.time.Clock()
 
+        HitButton(self.test)
+        StandButton(self.test)
+
     def run(self):
         running = True
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-                HitButton.instances.update(event)
+                Button.instances.update(event)
             self.render()
 
             self.clock.tick(60)
@@ -28,5 +33,8 @@ class Game:
     def render(self):
         self.screen.fill((0, 0, 0))
         Card.instances.draw(self.screen)
-        HitButton.instances.draw(self.screen)
+        Button.instances.draw(self.screen)
         pygame.display.flip()
+
+    def test(self):
+        print('test')

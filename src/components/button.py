@@ -1,21 +1,16 @@
 import pygame
 
-from settings import (
-    BUTTON_HEIGHT,
-    BUTTON_WIDTH,
-    WINDOW_HEIGHT,
-    WINDOW_WIDTH,
-)
+from settings import BUTTON_HEIGHT, BUTTON_WIDTH
 
 
 class Button(pygame.sprite.Sprite):
     instances = pygame.sprite.Group()
 
-    def __init__(self, callback, image_path):
+    def __init__(self, callback, image_path, top, left):
         super().__init__()
         self.callback = callback
         self.load_image(image_path)
-        self.set_position()
+        self.set_position(top, left)
         Button.instances.add(self)
 
     def draw(self, screen):
@@ -25,9 +20,7 @@ class Button(pygame.sprite.Sprite):
         image = pygame.image.load(image_path)
         self.image = pygame.transform.scale(image, (BUTTON_WIDTH, BUTTON_HEIGHT))
 
-    def set_position(self):
-        left = WINDOW_WIDTH - BUTTON_WIDTH - 10
-        top = WINDOW_HEIGHT - BUTTON_HEIGHT - 10
+    def set_position(self, top, left):
         self.rect = self.image.get_rect()
         self.rect.topleft = left, top
 
