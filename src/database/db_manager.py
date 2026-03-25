@@ -1,7 +1,10 @@
+from pathlib import Path
 import sqlite3
-from datetime import datetime
 
-DB_PATH = "blackjack.db"
+
+BASE_DIR = Path(__file__).resolve().parent
+DB_PATH = BASE_DIR.parent.parent / "blackjack.db"
+SCHEMA_PATH = BASE_DIR / "schema.sql"
 
 
 def get_connection():
@@ -13,7 +16,7 @@ def get_connection():
 def init_db():
     conn = get_connection()
 
-    with open("src/database/schema.sql", "r") as f:
+    with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
         conn.executescript(f.read())
 
     conn.commit()
@@ -59,6 +62,7 @@ def log_game_ended(game_id: str, end_time: str, duration_seconds: int):
     conn.commit()
     conn.close()
 
+
 def log_round_started(round_id: str, game_id: str, round_number: int, start_time: str):
     conn = get_connection()
     cursor = conn.cursor()
@@ -85,8 +89,14 @@ def log_round_ended(round_id: str, end_time: str):
     conn.commit()
     conn.close()
 
-def log_initial_deal(deal_id: str, round_id: str, player_id: str,
-                     initial_hand_value: int, dealer_card: str):
+
+def log_initial_deal(
+    deal_id: str,
+    round_id: str,
+    player_id: str,
+    initial_hand_value: int,
+    dealer_card: str
+):
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -101,6 +111,7 @@ def log_initial_deal(deal_id: str, round_id: str, player_id: str,
     conn.commit()
     conn.close()
 
+
 def log_player_action(
     action_id: str,
     game_id: str,
@@ -108,8 +119,8 @@ def log_player_action(
     player_id: str,
     action_type: str,
     hand_value_before: int,
-    hand_value_after: int,
-    drawn_card: str,
+    hand_value_after: int | None,
+    drawn_card: str | None,
     action_order: int,
     timestamp: str
 ):
@@ -132,3 +143,37 @@ def log_player_action(
     conn.commit()
     conn.close()
 
+
+def log_round_result(
+    result_id: str,
+    round_id: str,
+    player_id: str,
+    final_hand_value: int,
+    dealer_final_value: int,
+    result: str,
+    has_blackjack: int,
+    has_bust: int,
+    bet_amount: float,
+    gain_loss: float,
+    end_time: str
+):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO round_results (
+            result_id, round_id, player_id,
+            final_hand_value, dealer_final_value,
+            result, has_blackjack, has_bust,
+            bet_amount, gain_loss, end_time
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        result_id, round_id, player_id,
+        final_hand_value, dealer_final_value,
+        result, has_blackjack, has_bust,
+        bet_amount, gain_loss, end_time
+    ))
+
+    conn.commit()
+    conn.close()

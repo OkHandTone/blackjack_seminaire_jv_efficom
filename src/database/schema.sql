@@ -87,9 +87,13 @@ CREATE TABLE IF NOT EXISTS round_results (
 );
 
 -- ========================
--- INDEX (optionnel mais pro)
+-- INDEX 
 -- ========================
 CREATE INDEX IF NOT EXISTS idx_rounds_game_id ON rounds(game_id);
 CREATE INDEX IF NOT EXISTS idx_actions_round_id ON player_actions(round_id);
 CREATE INDEX IF NOT EXISTS idx_actions_player_id ON player_actions(player_id);
 CREATE INDEX IF NOT EXISTS idx_results_player_id ON round_results(player_id);
+
+CREATE INDEX IF NOT EXISTS idx_results_round_id ON round_results(round_id);
+CREATE INDEX IF NOT EXISTS idx_initial_deals_round_id ON initial_deals(round_id);
+CREATE INDEX IF NOT EXISTS idx_initial_deals_player_id ON initial_deals(player_id);
