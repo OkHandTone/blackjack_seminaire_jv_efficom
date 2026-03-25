@@ -1,6 +1,7 @@
 import pygame
 
 from card import Card
+from hit_button import HitButton
 from settings import DISPLAY_CAPTION, WINDOW_HEIGHT, WINDOW_WIDTH
 
 
@@ -18,11 +19,14 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                HitButton.instances.update(event)
             self.render()
+
             self.clock.tick(60)
         pygame.quit()
 
     def render(self):
         self.screen.fill((0, 0, 0))
         Card.instances.draw(self.screen)
+        HitButton.instances.draw(self.screen)
         pygame.display.flip()
