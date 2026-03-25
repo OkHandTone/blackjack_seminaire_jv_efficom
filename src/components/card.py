@@ -36,8 +36,8 @@ class Card(pygame.sprite.Sprite):
         if self.player == 1:
             top = 10
         else:
-            top = WINDOW_HEIGHT - self.image.get_height() - 10
-        left = 10 + ((self.image.get_width() + 10) * self.cards)
+            top = WINDOW_HEIGHT - CARD_HEIGHT - 10
+        left = 10 + ((CARD_WIDTH + 10) * self.cards)
         self.rect = self.image.get_rect()
         self.rect.topleft = (int(left), top)
 
