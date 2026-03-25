@@ -5,7 +5,10 @@ from datetime import datetime
 
 import pygame
 
+from components.button import Button
 from components.card import Card
+from components.hit_button import HitButton
+from components.stand_button import StandButton
 from croupier import Croupier
 from database.db_manager import init_db, insert_player, log_game_started
 from player import Player
@@ -16,6 +19,9 @@ class Game:
     def __init__(self):
         pygame.init()
         pygame.display.set_caption(DISPLAY_CAPTION)
+
+        HitButton(self.player_hit)
+        StandButton(self.player_stand)
 
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.clock = pygame.time.Clock()
@@ -206,6 +212,7 @@ class Game:
         running = True
         while running:
             for event in pygame.event.get():
+                Button.instances.update(event)
                 if event.type == pygame.QUIT:
                     running = False
 
@@ -231,7 +238,6 @@ class Game:
                     else:
                         if event.key == pygame.K_r:
                             self.reset_game()
-
             self.render()
             self.clock.tick(60)
         pygame.quit()
@@ -239,6 +245,7 @@ class Game:
     def render(self):
         self.screen.fill((34, 139, 34))
         Card.instances.draw(self.screen)
+        Button.instances.draw(self.screen)
         self.draw_scores()
 
         if self.game_over:
