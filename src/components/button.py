@@ -1,5 +1,3 @@
-import os
-
 import pygame
 
 from settings import (
@@ -10,21 +8,20 @@ from settings import (
 )
 
 
-class HitButton(pygame.sprite.Sprite):
+class Button(pygame.sprite.Sprite):
     instances = pygame.sprite.Group()
 
-    def __init__(self, callback):
+    def __init__(self, callback, image_path):
         super().__init__()
         self.callback = callback
-        self.load_image()
+        self.load_image(image_path)
         self.set_position()
-        HitButton.instances.add(self)
+        Button.instances.add(self)
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
-    def load_image(self):
-        image_path = os.path.join("assets", "buttons", "hit.bmp")
+    def load_image(self, image_path):
         image = pygame.image.load(image_path)
         self.image = pygame.transform.scale(image, (BUTTON_WIDTH, BUTTON_HEIGHT))
 

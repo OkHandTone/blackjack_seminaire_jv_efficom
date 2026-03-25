@@ -1,7 +1,7 @@
 import pygame
 
-from card import Card
-from hit_button import HitButton
+from components.card import Card
+from components.hit_button import HitButton
 from settings import DISPLAY_CAPTION, WINDOW_HEIGHT, WINDOW_WIDTH
 
 
