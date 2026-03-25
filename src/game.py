@@ -12,7 +12,14 @@ from components.stand_button import StandButton
 from croupier import Croupier
 from database.db_manager import init_db, insert_player, log_game_started
 from player import Player
-from settings import CARD_HEIGHT, DISPLAY_CAPTION, WINDOW_HEIGHT, WINDOW_WIDTH
+from settings import (
+    BUTTON_HIT,
+    BUTTON_STAND,
+    CARD_HEIGHT,
+    DISPLAY_CAPTION,
+    WINDOW_HEIGHT,
+    WINDOW_WIDTH,
+)
 
 
 class Game:
@@ -33,16 +40,12 @@ class Game:
         try:
             insert_player(self.player_id, username)
         except sqlite3.IntegrityError:
-            print("Nom déjà utilisé, veuillez choisir un autre nom.")
             exit()
 
         self.game_id = str(uuid.uuid4())
         self.start_time = datetime.now().isoformat()
 
-        # On logue la partie avec 1 joueur (toi)
         log_game_started(self.game_id, self.start_time, 1)
-        print(f"[BDD] Partie démarrée en base avec l'ID: {self.game_id}")
-        # ==========================================
 
         self.player1 = Player(name=username)
         self.dealer = Croupier()
@@ -65,13 +68,13 @@ class Game:
 
         for i in range(2):
             rank, suit = self.deck.pop()
-            self.dealer.add_card((rank, suit))  # Sauvegarde backend
+            self.dealer.add_card((rank, suit))
             is_flipped = True if i == 0 else False
             Card(rank, suit, i, 1, is_flipped)
 
         for i in range(2):
             rank, suit = self.deck.pop()
-            self.player1.add_card((rank, suit))  # Sauvegarde backend
+            self.player1.add_card((rank, suit))
             Card(rank, suit, i, 2, True)
 
         self.player1.show_hand()
@@ -89,22 +92,20 @@ class Game:
         return self.player1.calculate_score(), self.dealer.calculate_score()
 
     def player_hit(self):
-        """Action de tirer une nouvelle carte UNIQUEMENT pour le Joueur (ID 2)."""
         if len(self.deck) > 0:
             rank, suit = self.deck.pop()
             self.player1.add_card((rank, suit))
-            card_index = len(self.player1.hand) - 1
+            card_index = len(self.player1.hand) - 1  # cal nbr carte packet
             Card(rank, suit, card_index, 2, True)
 
-            print("\n--- Le joueur (ID 2) a tiré une carte ! ---")
             self.player1.show_hand()
             for sprite_card in Card.instances:
-                if sprite_card.player == 1 and sprite_card.cards == 1:
+                if (
+                    sprite_card.player == 1 and sprite_card.cards == 1
+                ):  # logique afficher 2 eme carte croupier
                     sprite_card.show()
 
     def player_stand(self):
-        """Action de rester (Stand) pour le joueur. C'est au tour du croupier."""
-        print("\n--- Le joueur reste. Au tour du croupier ! ---")
 
         for sprite_card in Card.instances:
             if sprite_card.player == 1 and sprite_card.cards == 1:
@@ -114,27 +115,21 @@ class Game:
         while self.dealer.calculate_score() < 17:
             if len(self.deck) > 0:
                 rank, suit = self.deck.pop()
-                self.dealer.add_card((rank, suit))  # Backend
+                self.dealer.add_card((rank, suit))
 
                 card_index = len(self.dealer.hand) - 1
                 Card(rank, suit, card_index, 1, True)
-
-                print("Le croupier tire une carte...")
                 self.dealer.show_hand()
 
         self.check_winner()
 
     def check_winner(self):
-        """Compare les scores et annonce le gagnant."""
+
         player_score = self.player1.calculate_score()
         dealer_score = self.dealer.calculate_score()
 
-        print("\n=== RÉSULTATS DE LA MANCHE ===")
-        print(f"Score final du Joueur   : {player_score}")
-        print(f"Score final du Croupier : {dealer_score}")
-
         if player_score > 21:
-            self.end_game("Bust ! Le Croupier gagne.")
+            self.end_game("Le Croupier gagne.")
         elif dealer_score > 21:
             self.end_game("Le Croupier a sauté ! Vous gagnez.")
         elif player_score > dealer_score:
@@ -145,13 +140,10 @@ class Game:
             self.end_game("Égalité (Push).")
 
     def end_game(self, message):
-        """Bloque le jeu à la fin de la manche et stocke le résultat."""
         self.game_over = True
         self.end_message = message
-        print(f"Fin de la partie ! Résultat : {message}")
 
     def draw_scores(self):
-        """Affiche les scores du joueur et du croupier à l'écran."""
 
         p_score = self.player1.calculate_score()
         p_text = self.score_font.render(f"Score: {p_score}", True, (255, 255, 255))
@@ -187,12 +179,11 @@ class Game:
 
         d_text = self.score_font.render(f"{d_label}: {d_score}", True, (255, 255, 255))
 
-        d_y = 10 + CARD_HEIGHT + 10  # 10px en dessous des cartes
+        d_y = 10 + CARD_HEIGHT + 10
         d_rect = d_text.get_rect(center=(WINDOW_WIDTH // 2, d_y))
         self.screen.blit(d_text, d_rect)
 
     def reset_game(self):
-        """Nettoie la table et relance une nouvelle manche."""
         self.player1.hand = []
         self.dealer.hand = []
 
@@ -206,7 +197,6 @@ class Game:
         random.shuffle(self.deck)
 
         self.deal_initial_cards()
-        print("\n--- NOUVELLE MANCHE DÉMARRÉE ---")
 
     def run(self):
         running = True
@@ -217,12 +207,10 @@ class Game:
                     running = False
 
                 if event.type == pygame.KEYDOWN:
-                    # Si le jeu N'EST PAS fini, on peut jouer
                     if not self.game_over:
-                        if event.key == pygame.K_RIGHT:  # Flèche Droite = Tirer
+                        if event.key == BUTTON_HIT:
                             self.player_hit()
 
-                            # Vérification immédiate
                             score_actuel = self.player1.calculate_score()
 
                             if score_actuel > 21:
@@ -231,10 +219,9 @@ class Game:
                                 print("21 atteint ! Tour automatique du croupier.")
                                 self.player_stand()
 
-                        elif event.key == pygame.K_LEFT:  # Flèche Gauche = Rester
+                        elif event.key == BUTTON_STAND:
                             self.player_stand()
 
-                    # Si le jeu EST fini, on écoute la touche R
                     else:
                         if event.key == pygame.K_r:
                             self.reset_game()
