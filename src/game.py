@@ -237,27 +237,15 @@ class Game:
         pygame.quit()
 
     def render(self):
-        # Fond Vert Casino
         self.screen.fill((34, 139, 34))
-
-        # Dessiner les cartes
         Card.instances.draw(self.screen)
-
-        # NOUVEAU : Dessiner les scores UI par-dessus les cartes
         self.draw_scores()
 
-        # Dessiner le message Game Over si nécessaire
         if self.game_over:
-            # ... (tout ton code existant de Game Over reste ici) ...
-            # 1. Le texte du résultat (gagné/perdu)
-            texte_resultat = self.font.render(
-                self.end_message, True, (255, 215, 0)
-            )  # En jaune or
+            texte_resultat = self.font.render(self.end_message, True, (255, 215, 0))
             rect_resultat = texte_resultat.get_rect(
                 center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 30)
             )
-
-            # 2. Le texte pour relancer (plus petit)
             font_small = pygame.font.SysFont("Arial", 25, bold=True)
             texte_restart = font_small.render(
                 "Press R pour relancer", True, (255, 255, 255)
@@ -266,7 +254,6 @@ class Game:
                 center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 30)
             )
 
-            # 3. Le fond noir semi-transparent ajusté à la taille des textes
             largeur_box = max(rect_resultat.width, rect_restart.width) + 40
             hauteur_box = rect_resultat.height + rect_restart.height + 40
             fond = pygame.Surface((largeur_box, hauteur_box))
@@ -274,7 +261,6 @@ class Game:
             fond.fill((0, 0, 0))
             rect_fond = fond.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
 
-            # 4. On dessine le tout à l'écran
             self.screen.blit(fond, rect_fond)
             self.screen.blit(texte_resultat, rect_resultat)
             self.screen.blit(texte_restart, rect_restart)
