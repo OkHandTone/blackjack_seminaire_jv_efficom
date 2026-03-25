@@ -10,25 +10,23 @@ class Card(pygame.sprite.Sprite):
 
     def __init__(self, rank, suit, cards, player, isFlipped):
         super().__init__()
-        self.rank = rank
-        self.suit = suit
-        self.cards = cards
         self.player = player
-        self.isFlipped = isFlipped
+        self.cards = cards
+        self.image_path = f"{rank}{suit}.bmp"
         Card.instances.add(self)
 
-        if self.isFlipped:
-            self.load_image()
+        if isFlipped:
+            self.load_image(self.image_path)
         else:
-            self.load_back()
+            self.load_image("back.bmp")
 
         self.set_position()
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
 
-    def load_image(self):
-        image_path = os.path.join("assets", "cards", f"{self.rank}{self.suit}.bmp")
+    def load_image(self, filename):
+        image_path = os.path.join("assets", "cards", filename)
         image = pygame.image.load(image_path)
         self.image = pygame.transform.scale(image, (CARD_WIDTH, CARD_HEIGHT))
 
@@ -41,10 +39,5 @@ class Card(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.topleft = (int(left), top)
 
-    def load_back(self):
-        image_path = os.path.join("assets", "cards", "back.bmp")
-        image = pygame.image.load(image_path)
-        self.image = pygame.transform.scale(image, (CARD_WIDTH, CARD_HEIGHT))
-
     def show(self):
-        self.load_image()
+        self.load_image(self.image_path)
