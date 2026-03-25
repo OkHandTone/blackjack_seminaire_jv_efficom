@@ -1,3 +1,8 @@
+import random
+import sqlite3
+import uuid
+from datetime import datetime
+
 import pygame
 
 from components.button import Button
@@ -31,7 +36,7 @@ class Game:
         pygame.quit()
 
     def render(self):
-        self.screen.fill((0, 0, 0))
+        self.screen.fill((34, 139, 34))
         Card.instances.draw(self.screen)
         Button.instances.draw(self.screen)
         pygame.display.flip()
