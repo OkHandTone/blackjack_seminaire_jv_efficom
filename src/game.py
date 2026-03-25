@@ -100,9 +100,8 @@ class Game:
 
             self.player1.show_hand()
             for sprite_card in Card.instances:
-                if (
-                    sprite_card.player == 1 and sprite_card.cards == 1
-                ):  # logique afficher 2 eme carte croupier
+                if sprite_card.player == 1 and sprite_card.cards == 1:
+                    # Afficher la 2e carte du croupier et ajoute sa somme a son score
                     sprite_card.show()
 
     def player_stand(self):
@@ -110,6 +109,7 @@ class Game:
         for sprite_card in Card.instances:
             if sprite_card.player == 1 and sprite_card.cards == 1:
                 sprite_card.show()
+
         self.dealer.show_hand()
 
         while self.dealer.calculate_score() < 17:
