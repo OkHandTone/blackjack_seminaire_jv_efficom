@@ -48,16 +48,20 @@ def log_game_started(game_id: str, start_time: str, nb_players: int):
     conn.commit()
     conn.close()
 
-
-def log_game_ended(game_id: str, end_time: str, duration_seconds: int):
+def log_game_ended(game_id: str, end_time: str):
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute("""
         UPDATE games
-        SET end_time = ?, duration_seconds = ?
+        SET
+            end_time = ?,
+            duration_seconds = (
+                strftime('%s', replace(?, 'T', ' ')) -
+                strftime('%s', replace(start_time, 'T', ' '))
+            )
         WHERE game_id = ?
-    """, (end_time, duration_seconds, game_id))
+    """, (end_time, end_time, game_id))
 
     conn.commit()
     conn.close()
