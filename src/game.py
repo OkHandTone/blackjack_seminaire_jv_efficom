@@ -86,7 +86,6 @@ class Game:
         self.dealer.show_initial_hand()
 
         if self.player1.calculate_score() == 21:
-            print("BLACKJACK INITIAL !")
             for sprite_card in Card.instances:
                 if sprite_card.player == 1 and sprite_card.cards == 1:
                     sprite_card.show()
@@ -206,7 +205,6 @@ class Game:
                             if score_actuel > 21:
                                 self.check_winner()
                             elif score_actuel == 21:
-                                print("21 atteint ! Tour automatique du croupier.")
                                 self.player_stand()
 
                         elif event.key == BUTTON_STAND:
