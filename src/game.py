@@ -1,7 +1,10 @@
 import random
+import re
 import sqlite3
 import uuid
+from calendar import leapdays
 from datetime import datetime
+from os import close
 
 import pygame
 
@@ -16,10 +19,12 @@ from game_over_renderer import GameOverRenderer
 from player import Player
 from score_renderer import ScoreRenderer
 from settings import (
+    BUTTON_CLOSE,
     BUTTON_HIT,
+    BUTTON_RESET,
     BUTTON_STAND,
-    CARD_HEIGHT,
     DISPLAY_CAPTION,
+    GAME_BACKGROUND,
     RANK_CARD,
     SUIT_CARD,
     WINDOW_HEIGHT,
@@ -67,7 +72,7 @@ class Game:
     def deal_initial_cards(self):
 
         for i in range(2):
-            self._deal_card_to_dealer(i, is_first_card=(i != 0))
+            self._deal_card_to_dealer(i, is_first_card=(i == 0))
 
         for i in range(2):
             self._deal_card_to_player(i)
@@ -198,16 +203,18 @@ class Game:
             self.player_stand()
 
     def _handle_game_over_keys(self, event):
-        if event.key == pygame.K_r:
+        if event.key == BUTTON_RESET:
             self.reset_game()
 
+        if event.key == BUTTON_CLOSE:
+            pygame.quit()
+
     def render(self):
-        self.screen.fill((34, 139, 34))
+        self.screen.fill(GAME_BACKGROUND)
         Card.instances.draw(self.screen)
         Button.instances.draw(self.screen)
         self.draw_scores()
 
-        # Render game over message if game is over
         self.game_over_renderer.render(self.game_over, self.end_message)
 
         pygame.display.flip()
