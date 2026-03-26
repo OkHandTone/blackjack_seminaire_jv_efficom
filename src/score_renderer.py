@@ -1,6 +1,6 @@
 import pygame
 
-from settings import D_Y, P_Y, WINDOW_WIDTH
+from src.settings import D_Y, P_Y, WINDOW_WIDTH
 
 
 class ScoreRenderer:

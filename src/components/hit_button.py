@@ -1,7 +1,7 @@
 import os
 
-from components.button import Button
-from settings import BUTTON_HEIGHT, BUTTON_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH
+from src.components.button import Button
+from src.settings import BUTTON_HEIGHT, BUTTON_WIDTH, WINDOW_HEIGHT, WINDOW_WIDTH
 
 
 class HitButton(Button):

@@ -5,14 +5,14 @@ from datetime import datetime
 
 import pygame
 
-from components.ace_toggle import AceToggle
-from components.button import Button
-from components.card import Card
-from components.hit_button import HitButton
-from components.reset_button import ResetButton
-from components.stand_button import StandButton
-from croupier import Croupier
-from database.db_manager import (
+from src.components.ace_toggle import AceToggle
+from src.components.button import Button
+from src.components.card import Card
+from src.components.hit_button import HitButton
+from src.components.reset_button import ResetButton
+from src.components.stand_button import StandButton
+from src.croupier import Croupier
+from src.database.db_manager import (
     init_db,
     insert_player,
     log_game_ended,
@@ -23,11 +23,11 @@ from database.db_manager import (
     log_round_result,
     log_round_started,
 )
-from font_manager import FontManager
-from game_over_renderer import GameOverRenderer
-from player import Player
-from score_renderer import ScoreRenderer
-from settings import (
+from src.font_manager import FontManager
+from src.game_over_renderer import GameOverRenderer
+from src.player import Player
+from src.score_renderer import ScoreRenderer
+from src.settings import (
     BUTTON_CLOSE,
     BUTTON_HIT,
     BUTTON_RESET,
@@ -77,11 +77,12 @@ class Game:
         )
         self.game_over_renderer = GameOverRenderer(self.screen, self.font_manager)
 
-        self.round_id = str(uuid.uuid4())
         self._initialize_game_state()
 
         self.round_number = 1
+        self.round_id = str(uuid.uuid4())
         self.action_order = 0
+
         log_game_started(self.game_id, self.start_time, 1)
         log_round_started(
             self.round_id, self.game_id, self.round_number, self.start_time
@@ -154,14 +155,14 @@ class Game:
                 self.check_winner()
 
     def player_stand(self):
+        hand_value_before = self.player1.calculate_score()
+        self.action_order += 1
+        self._log_player_action("stand", hand_value_before, hand_value_before, None)
+
         self._reveal_dealer_second_card()
         self.dealer.show_hand()
         self.dealer.play_dealer_turn(self.deck)
         self.check_winner()
-
-        hand_value_before = self.player1.calculate_score()
-        self.action_order += 1
-        self._log_player_action("stand", hand_value_before, hand_value_before, None)
 
     def check_winner(self):
         player_score = self.player1.calculate_score()
@@ -185,15 +186,14 @@ class Game:
         player_final_value = self.player1.calculate_score()
         dealer_final_value = self.dealer.calculate_score()
 
-        result = "push"
-        if (
-            "gagnez" in message.lower()
-            or "gagne" in message.lower()
-            and "Croupier" not in message
-        ):
-            result = "win"
-        elif "Croupier gagne" in message:
+        msg = message.lower()
+
+        if "croupier gagne" in msg:
             result = "lose"
+        elif "gagnez" in msg or ("gagne" in msg and "croupier" not in msg):
+            result = "win"
+        else:
+            result = "push"
 
         has_blackjack = 1 if self.player1.has_blackjack() else 0
         has_bust = 1 if self.player1.is_busted() else 0
@@ -219,8 +219,7 @@ class Game:
             bet_amount,
             gain_loss,
             end_time,
-        )
-        log_game_ended(self.game_id, end_time)
+    )
         log_round_ended(self.round_id, end_time)
 
     def draw_scores(self):
@@ -236,14 +235,14 @@ class Game:
 
         self._initialize_game_state()
 
-        self.deal_initial_cards()
-
         self.round_number += 1
         self.round_id = str(uuid.uuid4())
         self.action_order = 0
         log_round_started(
             self.round_id, self.game_id, self.round_number, datetime.now().isoformat()
         )
+
+        self.deal_initial_cards()
 
     def _initialize_deck(self):
         suits = SUIT_CARD
@@ -287,6 +286,10 @@ class Game:
                 running = False
             self.render()
             self.clock.tick(60)
+
+        end_time = datetime.now().isoformat()
+        log_game_ended(self.game_id, end_time)
+
         pygame.quit()
 
     def _handle_events(self):

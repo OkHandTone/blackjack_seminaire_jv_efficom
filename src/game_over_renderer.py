@@ -1,7 +1,7 @@
 import pygame
 
-from font_manager import FontManager
-from settings import WINDOW_HEIGHT, WINDOW_WIDTH
+from src.font_manager import FontManager
+from src.settings import WINDOW_HEIGHT, WINDOW_WIDTH
 
 
 class GameOverRenderer:

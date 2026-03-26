@@ -1,6 +1,6 @@
 import pygame
 
-from settings import BUTTON_HEIGHT, BUTTON_WIDTH
+from src.settings import BUTTON_HEIGHT, BUTTON_WIDTH
 
 
 class Button(pygame.sprite.Sprite):

@@ -2,7 +2,7 @@ import os
 
 import pygame
 
-from settings import CARD_HEIGHT, CARD_WIDTH, WINDOW_HEIGHT
+from src.settings import CARD_HEIGHT, CARD_WIDTH, WINDOW_HEIGHT
 
 
 class Card(pygame.sprite.Sprite):
