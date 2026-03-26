@@ -74,7 +74,7 @@ class Game:
     def deal_initial_cards(self):
 
         for i in range(2):
-            self._deal_card_to_dealer(i, is_first_card=(i == 0))
+            self._deal_card_to_dealer(i, is_first_card=(i != 0))
 
         for i in range(2):
             self._deal_card_to_player(i)
@@ -128,7 +128,9 @@ class Game:
         self.end_message = message
 
     def draw_scores(self):
-        self.score_renderer.draw_scores(self.player1, self.dealer, self.game_over)
+        self.score_renderer.draw_scores(
+            self.player1, self.dealer, self.game_over, self.dealer_second_card_revealed
+        )
 
     def reset_game(self):
         self.player1.clear_hand()
@@ -149,6 +151,7 @@ class Game:
     def _initialize_game_state(self):
         self.game_over = False
         self.end_message = ""
+        self.dealer_second_card_revealed = False
         self._initialize_deck()
 
     def _deal_card_to_dealer(self, card_index, is_first_card=True):
@@ -163,12 +166,14 @@ class Game:
         Card(rank, suit, card_index, self.player1.player_number, True)
 
     def _reveal_dealer_second_card(self):
-        for sprite_card in Card.instances:
-            if (
-                sprite_card.player == self.dealer.player_number
-                and sprite_card.cards == 1
-            ):
-                sprite_card.show()
+        if not self.dealer_second_card_revealed:
+            for sprite_card in Card.instances:
+                if (
+                    sprite_card.player == self.dealer.player_number
+                    and sprite_card.cards == 1
+                ):
+                    sprite_card.show()
+            self.dealer_second_card_revealed = True
 
     def run(self):
         running = True

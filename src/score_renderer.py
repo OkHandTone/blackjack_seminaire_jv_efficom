@@ -14,8 +14,10 @@ class ScoreRenderer:
         score_rect = score_text.get_rect(center=(WINDOW_WIDTH // 2, y_position))
         self.screen.blit(score_text, score_rect)
 
-    def draw_dealer_score(self, dealer, game_over=False, y_position=D_Y):
-        if game_over:
+    def draw_dealer_score(
+        self, dealer, game_over=False, y_position=D_Y, dealer_second_card_revealed=False
+    ):
+        if game_over or dealer_second_card_revealed:
             score = dealer.calculate_score()
             label = "Dealer (Total)"
         else:
@@ -26,7 +28,9 @@ class ScoreRenderer:
         score_rect = score_text.get_rect(center=(WINDOW_WIDTH // 2, y_position))
         self.screen.blit(score_text, score_rect)
 
-    def draw_scores(self, player, dealer, game_over=False):
+    def draw_scores(
+        self, player, dealer, game_over=False, dealer_second_card_revealed=False
+    ):
 
         self.draw_player_score(player)
-        self.draw_dealer_score(dealer, game_over)
+        self.draw_dealer_score(dealer, game_over, D_Y, dealer_second_card_revealed)
