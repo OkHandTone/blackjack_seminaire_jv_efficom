@@ -1,7 +1,7 @@
 import pygame
 
 from components.card import Card
-from settings import POINT_VALUE
+from settings import POINT_VALUE, POINT_VALUE_ACE_1
 
 
 class Player:
@@ -11,6 +11,9 @@ class Player:
         self.name = name
         self.hand = []
         self.player_number = player_number
+
+    def set_ace_value(self, value):
+        self.point_values = POINT_VALUE_ACE_1 if value == 1 else POINT_VALUE
 
     def add_card(self, card_data):
         self.hand.append(card_data)
