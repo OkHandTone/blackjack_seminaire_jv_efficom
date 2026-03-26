@@ -1,7 +1,7 @@
 import pygame
 
-from src.components.button import Button
-from src.settings import GAME_BACKGROUND, WINDOW_WIDTH
+from components.button import Button
+from settings import GAME_BACKGROUND, WINDOW_WIDTH
 
 
 class AceToggle(Button):

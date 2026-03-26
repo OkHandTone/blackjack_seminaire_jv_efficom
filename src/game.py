@@ -5,14 +5,14 @@ from datetime import datetime
 
 import pygame
 
-from src.components.ace_toggle import AceToggle
-from src.components.button import Button
-from src.components.card import Card
-from src.components.hit_button import HitButton
-from src.components.reset_button import ResetButton
-from src.components.stand_button import StandButton
-from src.croupier import Croupier
-from src.database.db_manager import (
+from components.ace_toggle import AceToggle
+from components.button import Button
+from components.card import Card
+from components.hit_button import HitButton
+from components.reset_button import ResetButton
+from components.stand_button import StandButton
+from croupier import Croupier
+from database.db_manager import (
     init_db,
     insert_player,
     log_game_ended,
@@ -23,11 +23,11 @@ from src.database.db_manager import (
     log_round_result,
     log_round_started,
 )
-from src.font_manager import FontManager
-from src.game_over_renderer import GameOverRenderer
-from src.player import Player
-from src.score_renderer import ScoreRenderer
-from src.settings import (
+from font_manager import FontManager
+from game_over_renderer import GameOverRenderer
+from player import Player
+from score_renderer import ScoreRenderer
+from settings import (
     BUTTON_CLOSE,
     BUTTON_HIT,
     BUTTON_RESET,

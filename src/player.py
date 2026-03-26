@@ -1,7 +1,7 @@
 import pygame
 
-from src.components.card import Card
-from src.settings import POINT_VALUE, POINT_VALUE_ACE_1
+from components.card import Card
+from settings import POINT_VALUE, POINT_VALUE_ACE_1
 
 
 class Player:

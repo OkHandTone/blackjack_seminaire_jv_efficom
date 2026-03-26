@@ -1,7 +1,7 @@
 import pygame
 
-from src.components.card import Card
-from src.player import Player
+from components.card import Card
+from player import Player
 
 
 class Croupier(Player):
