@@ -59,7 +59,9 @@ class Game:
 
         # 5. Rendering system initialization
         self.font_manager = FontManager()
-        self.score_renderer = ScoreRenderer(self.screen, self.font_manager.get_score_font())
+        self.score_renderer = ScoreRenderer(
+            self.screen, self.font_manager.get_score_font()
+        )
         self.game_over_renderer = GameOverRenderer(self.screen, self.font_manager)
 
         # 6. Game state initialization
@@ -71,7 +73,7 @@ class Game:
         """Deal initial cards to both player and dealer"""
         # Deal cards to dealer
         for i in range(2):
-            self._deal_card_to_dealer(i, is_first_card=(i == 0))
+            self._deal_card_to_dealer(i, is_first_card=(i != 0))
 
         # Deal cards to player
         for i in range(2):
@@ -82,7 +84,10 @@ class Game:
 
         if self.player1.has_blackjack():
             for sprite_card in Card.instances:
-                if sprite_card.player == self.dealer.player_number and sprite_card.cards == 1:
+                if (
+                    sprite_card.player == self.dealer.player_number
+                    and sprite_card.cards == 1
+                ):
                     sprite_card.show()
             self.check_winner()
 
@@ -156,7 +161,7 @@ class Game:
         self.end_message = ""
         self._initialize_deck()
 
-    def _deal_card_to_dealer(self, card_index, is_first_card=False):
+    def _deal_card_to_dealer(self, card_index, is_first_card=True):
         """
         Deal a card to the dealer
 
@@ -166,7 +171,7 @@ class Game:
         """
         rank, suit = self.deck.pop()
         self.dealer.add_card((rank, suit))
-        is_flipped = not is_first_card  # First card is face down
+        is_flipped = not is_first_card
         Card(rank, suit, card_index, self.dealer.player_number, is_flipped)
 
     def _deal_card_to_player(self, card_index):
@@ -183,7 +188,10 @@ class Game:
     def _reveal_dealer_second_card(self):
         """Reveal the dealer's second card (face down card)"""
         for sprite_card in Card.instances:
-            if sprite_card.player == self.dealer.player_number and sprite_card.cards == 1:
+            if (
+                sprite_card.player == self.dealer.player_number
+                and sprite_card.cards == 1
+            ):
                 sprite_card.show()
 
     def run(self):

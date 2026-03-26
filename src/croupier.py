@@ -37,7 +37,6 @@ class Croupier(Player):
         return self.calculate_score()
 
     def hit(self, deck):
-        """Draw a card from the deck and add it to dealer's hand"""
         if len(deck) > 0:
             rank, suit = deck.pop()
             self.add_card((rank, suit))
@@ -47,7 +46,6 @@ class Croupier(Player):
         return False
 
     def should_hit(self):
-        """Determine if dealer should hit (score < 17)"""
         return self.calculate_score() < 17
 
     def is_busted(self):

@@ -22,7 +22,6 @@ class Player:
         print(f"{self.name}'s hand: {self.hand} (Score: {self.calculate_score()})")
 
     def hit(self, deck):
-        """Draw a card from the deck and add it to player's hand"""
         if len(deck) > 0:
             rank, suit = deck.pop()
             self.add_card((rank, suit))
@@ -32,18 +31,14 @@ class Player:
         return False
 
     def should_stand(self):
-        """Determine if player should stand (score >= 21)"""
         score = self.calculate_score()
         return score >= 21
 
     def is_busted(self):
-        """Check if player's score exceeds 21"""
         return self.calculate_score() > 21
 
     def has_blackjack(self):
-        """Check if player has blackjack (score == 21 with 2 cards)"""
         return self.calculate_score() == 21 and len(self.hand) == 2
 
     def clear_hand(self):
-        """Clear player's hand for new game"""
         self.hand = []
