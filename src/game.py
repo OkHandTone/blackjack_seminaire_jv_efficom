@@ -11,6 +11,7 @@ import pygame
 from components.button import Button
 from components.card import Card
 from components.hit_button import HitButton
+from components.reset_button import ResetButton
 from components.stand_button import StandButton
 from croupier import Croupier
 from database.db_manager import init_db, insert_player, log_game_started
@@ -42,6 +43,7 @@ class Game:
 
         HitButton(self.player_hit)
         StandButton(self.player_stand)
+        ResetButton(self.reset_game)
 
         init_db()
         self.player_id = str(uuid.uuid4())
