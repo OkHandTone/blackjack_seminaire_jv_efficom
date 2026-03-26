@@ -143,10 +143,11 @@ def plot_average_game_duration(conn):
         return
 
     plt.figure(figsize=(9, 5))
-    bars = plt.bar(df["game_id"].astype(str), df["duration_seconds"])
+    df["game_label"] = [f"Partie {i+1}" for i in range(len(df))]
+    bars = plt.bar(df["game_label"], df["duration_seconds"])
 
     plt.title("Durée des parties")
-    plt.xlabel("Identifiant de partie")
+    plt.xlabel("Parties")
     plt.ylabel("Durée (secondes)")
     plt.xticks(rotation=45, ha="right")
     plt.grid(axis="y", linestyle="--", alpha=0.7)
