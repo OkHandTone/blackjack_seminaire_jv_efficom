@@ -1,29 +1,44 @@
+import pygame
+
+from components.card import Card
+from settings import POINT_VALUE
+
+
 class Player:
-    valeurs_point = {
-        "2": 2,
-        "3": 3,
-        "4": 4,
-        "5": 5,
-        "6": 6,
-        "7": 7,
-        "8": 8,
-        "9": 9,
-        "10": 10,
-        "J": 10,
-        "Q": 10,
-        "K": 10,
-        "A": 11,
-    }
+    point_values = POINT_VALUE
 
-    def __init__(self, nom="Joueur"):
-        self.nom = nom
-        self.main = []
+    def __init__(self, name="Player", player_number=2):
+        self.name = name
+        self.hand = []
+        self.player_number = player_number
 
-    def ajouter_carte(self, carte):
-        self.main.append(carte)
+    def add_card(self, card_data):
+        self.hand.append(card_data)
 
-    def calculer_score(self):
-        return sum(self.valeurs_point[rang] for _, rang in self.main)
+    def calculate_score(self):
+        return sum(self.point_values[rank] for rank, suit in self.hand)
 
-    def afficher_main(self):
-        print(f"Main de {self.nom} : {self.main} (Score : {self.calculer_score()})")
+    def show_hand(self):
+        print(f"{self.name}'s hand: {self.hand} (Score: {self.calculate_score()})")
+
+    def hit(self, deck):
+        if len(deck) > 0:
+            rank, suit = deck.pop()
+            self.add_card((rank, suit))
+            card_index = len(self.hand) - 1
+            Card(rank, suit, card_index, self.player_number, True)
+            return True
+        return False
+
+    def should_stand(self):
+        score = self.calculate_score()
+        return score >= 21
+
+    def is_busted(self):
+        return self.calculate_score() > 21
+
+    def has_blackjack(self):
+        return self.calculate_score() == 21 and len(self.hand) == 2
+
+    def clear_hand(self):
+        self.hand = []
