@@ -73,23 +73,27 @@ class Game:
         )
         self.game_over_renderer = GameOverRenderer(self.screen, self.font_manager)
 
+        self.round_id = str(uuid.uuid4())
         self._initialize_game_state()
 
-        self.deal_initial_cards()
-        self.total_score_players()
+
 
         self.round_number = 1
-        self.round_id = str(uuid.uuid4())
         self.action_order = 0
         log_game_started(self.game_id, self.start_time, 1)
         log_round_started(self.round_id, self.game_id, self.round_number, self.start_time)
+
+        self.deal_initial_cards()
+        self.total_score_players()
 
     def deal_initial_cards(self):
 
         dealer_first_card = None
 
         for i in range(2):
-            self._deal_card_to_dealer(i, is_first_card=(i != 0))
+            card = self._deal_card_to_dealer(i, is_first_card=(i != 0))
+            if i == 0:
+                dealer_first_card = card
 
         for i in range(2):
             self._deal_card_to_player(i)
@@ -109,6 +113,7 @@ class Game:
         initial_hand_value = self.player1.calculate_score()
         dealer_card_str = f"{dealer_first_card[0]}{dealer_first_card[1]}" if dealer_first_card else "Unknown"
         deal_id = str(uuid.uuid4())
+
         log_initial_deal(deal_id, self.round_id, self.player_id, initial_hand_value, dealer_card_str)
 
     def total_score_players(self):
