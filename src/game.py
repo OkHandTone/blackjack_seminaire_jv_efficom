@@ -5,13 +5,17 @@ from datetime import datetime
 
 import pygame
 
+from classes.croupier import Croupier
+from classes.font_manager import FontManager
+from classes.game_over_renderer import GameOverRenderer
+from classes.player import Player
+from classes.score_renderer import ScoreRenderer
 from components.ace_toggle import AceToggle
 from components.button import Button
 from components.card import Card
 from components.hit_button import HitButton
 from components.reset_button import ResetButton
 from components.stand_button import StandButton
-from croupier import Croupier
 from database.db_manager import (
     init_db,
     insert_player,
@@ -23,10 +27,6 @@ from database.db_manager import (
     log_round_result,
     log_round_started,
 )
-from font_manager import FontManager
-from game_over_renderer import GameOverRenderer
-from player import Player
-from score_renderer import ScoreRenderer
 from settings import (
     BUTTON_CLOSE,
     BUTTON_HIT,
