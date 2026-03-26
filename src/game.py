@@ -16,7 +16,12 @@ from settings import (
     BUTTON_HIT,
     BUTTON_STAND,
     CARD_HEIGHT,
+    D_Y,
     DISPLAY_CAPTION,
+    P_Y,
+    POINT_VALUE,
+    RANK_CARD,
+    SUIT_CARD,
     WINDOW_HEIGHT,
     WINDOW_WIDTH,
 )
@@ -50,8 +55,8 @@ class Game:
         self.player1 = Player(name=username)
         self.dealer = Croupier()
 
-        suits = ["C", "D", "H", "S"]
-        ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
+        suits = SUIT_CARD
+        ranks = RANK_CARD
         self.deck = [(r, s) for s in suits for r in ranks]
         random.shuffle(self.deck)
 
@@ -80,7 +85,6 @@ class Game:
         self.player1.show_hand()
         self.dealer.show_initial_hand()
 
-        # bonus
         if self.player1.calculate_score() == 21:
             print("BLACKJACK INITIAL !")
             for sprite_card in Card.instances:
@@ -148,25 +152,11 @@ class Game:
         p_score = self.player1.calculate_score()
         p_text = self.score_font.render(f"Score: {p_score}", True, (255, 255, 255))
 
-        p_y = WINDOW_HEIGHT - CARD_HEIGHT - 50
+        p_y = P_Y
         p_rect = p_text.get_rect(center=(WINDOW_WIDTH // 2, p_y))
         self.screen.blit(p_text, p_rect)
 
-        point_values = {
-            "2": 2,
-            "3": 3,
-            "4": 4,
-            "5": 5,
-            "6": 6,
-            "7": 7,
-            "8": 8,
-            "9": 9,
-            "10": 10,
-            "J": 10,
-            "Q": 10,
-            "K": 10,
-            "A": 11,
-        }
+        point_values = POINT_VALUE
 
         if self.game_over:
             d_score = self.dealer.calculate_score()
@@ -179,7 +169,7 @@ class Game:
 
         d_text = self.score_font.render(f"{d_label}: {d_score}", True, (255, 255, 255))
 
-        d_y = 10 + CARD_HEIGHT + 10
+        d_y = D_Y
         d_rect = d_text.get_rect(center=(WINDOW_WIDTH // 2, d_y))
         self.screen.blit(d_text, d_rect)
 
