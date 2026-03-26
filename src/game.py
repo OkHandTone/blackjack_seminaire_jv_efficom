@@ -180,8 +180,8 @@ class Game:
         self.game_over = False
         self.end_message = ""
 
-        suits = ["C", "D", "H", "S"]
-        ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
+        suits = SUIT_CARD
+        ranks = RANK_CARD
         self.deck = [(r, s) for s in suits for r in ranks]
         random.shuffle(self.deck)
 
