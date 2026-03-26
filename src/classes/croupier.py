@@ -1,7 +1,8 @@
 import pygame
 
 from components.card import Card
-from player import Player
+
+from .player import Player
 
 
 class Croupier(Player):
@@ -24,7 +25,6 @@ class Croupier(Player):
         )
 
     def play_dealer_turn(self, deck):
-        """Play dealer's turn according to blackjack rules (hit until 17)"""
         while self.calculate_score() < 17:
             if len(deck) > 0:
                 rank, suit = deck.pop()
@@ -49,15 +49,12 @@ class Croupier(Player):
         return self.calculate_score() < 17
 
     def is_busted(self):
-        """Check if dealer's score exceeds 21"""
         return self.calculate_score() > 21
 
     def clear_hand(self):
-        """Clear dealer's hand for new game"""
         self.hand = []
 
     def get_visible_score(self):
-        """Get the visible score (first card only) for display"""
         if len(self.hand) > 0:
             visible_card = self.hand[0]
             rank = visible_card[0]
