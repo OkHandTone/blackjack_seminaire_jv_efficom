@@ -11,15 +11,15 @@ from components.hit_button import HitButton
 from components.stand_button import StandButton
 from croupier import Croupier
 from database.db_manager import init_db, insert_player, log_game_started
+from font_manager import FontManager
+from game_over_renderer import GameOverRenderer
 from player import Player
+from score_renderer import ScoreRenderer
 from settings import (
     BUTTON_HIT,
     BUTTON_STAND,
     CARD_HEIGHT,
-    D_Y,
     DISPLAY_CAPTION,
-    P_Y,
-    POINT_VALUE,
     RANK_CARD,
     SUIT_CARD,
     WINDOW_HEIGHT,
@@ -29,15 +29,17 @@ from settings import (
 
 class Game:
     def __init__(self):
+        # 1. Pygame initialization
         pygame.init()
         pygame.display.set_caption(DISPLAY_CAPTION)
-
-        HitButton(self.player_hit)
-        StandButton(self.player_stand)
-
         self.screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
         self.clock = pygame.time.Clock()
 
+        # 2. UI components initialization
+        HitButton(self.player_hit)
+        StandButton(self.player_stand)
+
+        # 3. Database initialization
         init_db()
         self.player_id = str(uuid.uuid4())
         username = f"Player_{self.player_id[:8]}"
@@ -49,91 +51,69 @@ class Game:
 
         self.game_id = str(uuid.uuid4())
         self.start_time = datetime.now().isoformat()
-
         log_game_started(self.game_id, self.start_time, 1)
 
+        # 4. Game entities initialization
         self.player1 = Player(name=username)
         self.dealer = Croupier()
 
-        suits = SUIT_CARD
-        ranks = RANK_CARD
-        self.deck = [(r, s) for s in suits for r in ranks]
-        random.shuffle(self.deck)
+        # 5. Rendering system initialization
+        self.font_manager = FontManager()
+        self.score_renderer = ScoreRenderer(self.screen, self.font_manager.get_score_font())
+        self.game_over_renderer = GameOverRenderer(self.screen, self.font_manager)
 
-        self.game_over = False
-        self.end_message = ""
-        pygame.font.init()
-        self.font = pygame.font.SysFont("Arial", 40, bold=True)
-        self.score_font = pygame.font.SysFont("Arial", 28, bold=True)
-
+        # 6. Game state initialization
+        self._initialize_game_state()
         self.deal_initial_cards()
         self.total_score_players()
 
     def deal_initial_cards(self):
-
+        """Deal initial cards to both player and dealer"""
+        # Deal cards to dealer
         for i in range(2):
-            rank, suit = self.deck.pop()
-            self.dealer.add_card((rank, suit))
-            is_flipped = True if i == 0 else False
-            Card(rank, suit, i, 1, is_flipped)
+            self._deal_card_to_dealer(i, is_first_card=(i == 0))
 
+        # Deal cards to player
         for i in range(2):
-            rank, suit = self.deck.pop()
-            self.player1.add_card((rank, suit))
-            Card(rank, suit, i, 2, True)
+            self._deal_card_to_player(i)
 
         self.player1.show_hand()
         self.dealer.show_initial_hand()
 
-        if self.player1.calculate_score() == 21:
+        if self.player1.has_blackjack():
             for sprite_card in Card.instances:
-                if sprite_card.player == 1 and sprite_card.cards == 1:
+                if sprite_card.player == self.dealer.player_number and sprite_card.cards == 1:
                     sprite_card.show()
-            self.check_winner()  # On lance la comparaison des scores
+            self.check_winner()
 
     def total_score_players(self):
+        """Get current scores of both players"""
         return self.player1.calculate_score(), self.dealer.calculate_score()
 
     def player_hit(self):
-        if len(self.deck) > 0:
-            rank, suit = self.deck.pop()
-            self.player1.add_card((rank, suit))
-            card_index = len(self.player1.hand) - 1  # cal nbr carte packet
-            Card(rank, suit, card_index, 2, True)
-
+        """Handle player hitting"""
+        if self.player1.hit(self.deck):
             self.player1.show_hand()
-            for sprite_card in Card.instances:
-                if sprite_card.player == 1 and sprite_card.cards == 1:
-                    # Afficher la 2e carte du croupier et ajoute sa somme a son score
-                    sprite_card.show()
+            self._reveal_dealer_second_card()
+
+            if self.player1.should_stand():
+                self.check_winner()
 
     def player_stand(self):
-
-        for sprite_card in Card.instances:
-            if sprite_card.player == 1 and sprite_card.cards == 1:
-                sprite_card.show()
-
+        """Handle player standing and dealer's turn"""
+        self._reveal_dealer_second_card()
         self.dealer.show_hand()
-
-        while self.dealer.calculate_score() < 17:
-            if len(self.deck) > 0:
-                rank, suit = self.deck.pop()
-                self.dealer.add_card((rank, suit))
-
-                card_index = len(self.dealer.hand) - 1
-                Card(rank, suit, card_index, 1, True)
-                self.dealer.show_hand()
-
+        self.dealer.play_dealer_turn(self.deck)
         self.check_winner()
 
     def check_winner(self):
-
+        """Determine the winner based on scores"""
         player_score = self.player1.calculate_score()
         dealer_score = self.dealer.calculate_score()
 
-        if player_score > 21:
+        if self.player1.is_busted():
             self.end_game("Le Croupier gagne.")
-        elif dealer_score > 21:
+        elif self.dealer.is_busted():
             self.end_game("Le Croupier a sauté ! Vous gagnez.")
         elif player_score > dealer_score:
             self.end_game("Vous gagnez !")
@@ -143,108 +123,120 @@ class Game:
             self.end_game("Égalité (Push).")
 
     def end_game(self, message):
+        """End the game with a message"""
         self.game_over = True
         self.end_message = message
 
     def draw_scores(self):
-
-        p_score = self.player1.calculate_score()
-        p_text = self.score_font.render(f"Score: {p_score}", True, (255, 255, 255))
-
-        p_y = P_Y
-        p_rect = p_text.get_rect(center=(WINDOW_WIDTH // 2, p_y))
-        self.screen.blit(p_text, p_rect)
-
-        point_values = POINT_VALUE
-
-        if self.game_over:
-            d_score = self.dealer.calculate_score()
-            d_label = "Dealer (Total)"
-        else:
-            visible_card = self.dealer.hand[0]
-            rank = visible_card[0]
-            d_score = point_values.get(rank, 0)
-            d_label = "Dealer (Visible)"
-
-        d_text = self.score_font.render(f"{d_label}: {d_score}", True, (255, 255, 255))
-
-        d_y = D_Y
-        d_rect = d_text.get_rect(center=(WINDOW_WIDTH // 2, d_y))
-        self.screen.blit(d_text, d_rect)
+        """Draw player and dealer scores on screen"""
+        self.score_renderer.draw_scores(self.player1, self.dealer, self.game_over)
 
     def reset_game(self):
-        self.player1.hand = []
-        self.dealer.hand = []
+        """Reset the game for a new round"""
+        self.player1.clear_hand()
+        self.dealer.clear_hand()
 
         Card.instances.empty()
-        self.game_over = False
-        self.end_message = ""
 
+        # Reset game state
+        self._initialize_game_state()
+
+        self.deal_initial_cards()
+
+    def _initialize_deck(self):
+        """Initialize and shuffle a new deck of cards"""
         suits = SUIT_CARD
         ranks = RANK_CARD
         self.deck = [(r, s) for s in suits for r in ranks]
         random.shuffle(self.deck)
 
-        self.deal_initial_cards()
+    def _initialize_game_state(self):
+        """Initialize or reset the game state"""
+        self.game_over = False
+        self.end_message = ""
+        self._initialize_deck()
+
+    def _deal_card_to_dealer(self, card_index, is_first_card=False):
+        """
+        Deal a card to the dealer
+
+        Args:
+            card_index: Index of the card in dealer's hand
+            is_first_card: Whether this is the dealer's first card (face down)
+        """
+        rank, suit = self.deck.pop()
+        self.dealer.add_card((rank, suit))
+        is_flipped = not is_first_card  # First card is face down
+        Card(rank, suit, card_index, self.dealer.player_number, is_flipped)
+
+    def _deal_card_to_player(self, card_index):
+        """
+        Deal a card to the player
+
+        Args:
+            card_index: Index of the card in player's hand
+        """
+        rank, suit = self.deck.pop()
+        self.player1.add_card((rank, suit))
+        Card(rank, suit, card_index, self.player1.player_number, True)
+
+    def _reveal_dealer_second_card(self):
+        """Reveal the dealer's second card (face down card)"""
+        for sprite_card in Card.instances:
+            if sprite_card.player == self.dealer.player_number and sprite_card.cards == 1:
+                sprite_card.show()
 
     def run(self):
+        """Main game loop"""
         running = True
         while running:
-            for event in pygame.event.get():
-                Button.instances.update(event)
-                if event.type == pygame.QUIT:
-                    running = False
-
-                if event.type == pygame.KEYDOWN:
-                    if not self.game_over:
-                        if event.key == BUTTON_HIT:
-                            self.player_hit()
-
-                            score_actuel = self.player1.calculate_score()
-
-                            if score_actuel > 21:
-                                self.check_winner()
-                            elif score_actuel == 21:
-                                self.player_stand()
-
-                        elif event.key == BUTTON_STAND:
-                            self.player_stand()
-
-                    else:
-                        if event.key == pygame.K_r:
-                            self.reset_game()
+            if not self._handle_events():
+                running = False
             self.render()
             self.clock.tick(60)
         pygame.quit()
 
+    def _handle_events(self):
+        """Handle all pygame events"""
+        for event in pygame.event.get():
+            Button.instances.update(event)
+            if event.type == pygame.QUIT:
+                return False
+
+            if event.type == pygame.KEYDOWN:
+                self._handle_keydown_event(event)
+
+        return True
+
+    def _handle_keydown_event(self, event):
+        """Handle keydown events"""
+        if not self.game_over:
+            self._handle_gameplay_keys(event)
+        else:
+            self._handle_game_over_keys(event)
+
+    def _handle_gameplay_keys(self, event):
+        """Handle gameplay key presses"""
+        if event.key == BUTTON_HIT:
+            self.player_hit()
+            if self.player1.should_stand():
+                self.check_winner()
+        elif event.key == BUTTON_STAND:
+            self.player_stand()
+
+    def _handle_game_over_keys(self, event):
+        """Handle game over key presses"""
+        if event.key == pygame.K_r:
+            self.reset_game()
+
     def render(self):
+        """Render the game screen"""
         self.screen.fill((34, 139, 34))
         Card.instances.draw(self.screen)
         Button.instances.draw(self.screen)
         self.draw_scores()
 
-        if self.game_over:
-            texte_resultat = self.font.render(self.end_message, True, (255, 215, 0))
-            rect_resultat = texte_resultat.get_rect(
-                center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 30)
-            )
-            font_small = pygame.font.SysFont("Arial", 25, bold=True)
-            texte_restart = font_small.render(
-                "Press R pour relancer", True, (255, 255, 255)
-            )
-            rect_restart = texte_restart.get_rect(
-                center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 30)
-            )
-
-            largeur_box = max(rect_resultat.width, rect_restart.width) + 40
-            hauteur_box = rect_resultat.height + rect_restart.height + 40
-            fond = pygame.Surface((largeur_box, hauteur_box))
-            fond.set_alpha(200)
-            fond.fill((0, 0, 0))
-            rect_fond = fond.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2))
-
-            self.screen.blit(fond, rect_fond)
-            self.screen.blit(texte_resultat, rect_resultat)
-            self.screen.blit(texte_restart, rect_restart)
+        # Render game over message if game is over
+        self.game_over_renderer.render(self.game_over, self.end_message)
 
         pygame.display.flip()
