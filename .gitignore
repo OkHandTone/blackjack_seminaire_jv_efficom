@@ -3,3 +3,4 @@ src/database/__pycache__/
 .DS_Store
 blackjack.db
 charts/
+src/test_db.py
