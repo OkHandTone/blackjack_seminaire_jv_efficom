@@ -1,3 +1,5 @@
 prompt_toolkit==3.0.52
 pygame==2.6.1
 wcwidth==0.6.0
+pandas==3.0.1
+matplotlib==3.10.8
